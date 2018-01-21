@@ -1,15 +1,15 @@
 const express = require('express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const keys = require('./config/keys.js');
+const keys = require('./config/keys');
 const app = express();
 
 
 passport.use(new GoogleStrategy({
   clientID: keys.googleClientID,
-  clinetSecret: keys.googleClientSecret,
+  clientSecret: keys.googleClientSecret,
   callbackURL: '/auth/google/callback'
-}, (accessToken)=> {
+}, accessToken => {
   console.log(accessToken);
 }));
 //the strings are not random google has a list of strings that you can ask for
