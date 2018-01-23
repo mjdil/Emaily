@@ -1,24 +1,26 @@
 const express = require('express');
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const mongoose = require('mongoose');
 const keys = require('./config/keys');
+const cookieSession = require('cookie-session');
+const passport = require('passport');
+require('./models/user');
+require('./services/passport');
+const authRoutes = require('./routes/authRoutes');
+
+mongoose.connect(keys.mongoURI);
+
 const app = express();
+app.use(
+  cookieSession({
+    maxAge: 30*24*60*60*1000,
+    keys: [keys.cookiekey]
+  })
+);
 
+app.use(passport.initialize());
+app.use(passport.session());
 
-passport.use(new GoogleStrategy({
-  clientID: keys.googleClientID,
-  clientSecret: keys.googleClientSecret,
-  callbackURL: '/auth/google/callback'
-}, accessToken => {
-  console.log(accessToken);
-}));
-//the strings are not random google has a list of strings that you can ask for
-app.get('/auth/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
-
-
-
+authRoutes(app);
 
 //this tells us which port to listen to
 const PORT = process.env.PORT || 5000;
