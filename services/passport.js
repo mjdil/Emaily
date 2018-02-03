@@ -25,19 +25,17 @@ passport.use(new GoogleStrategy({
   callbackURL: '/auth/google/callback',
   proxy: true
 
-}, (accessToken, refreshToken, profile, done) => {
-  User.findOne({googleId:profile.id})
-  .then ((existingUser)=>{
+},
+async (accessToken, refreshToken, profile, done) => {
+  const existingUser = await User.findOne({googleId:profile.id})
+
     if (existingUser){
       //we aalredy have record
       done(null, existingUser); //existinf user is the userid
     }
     else{
-      new User({ googleId : profile.id}).save();// this creates a new model instance
-      .then(user => done(null,user));
-
+    const user = await  new User({ googleId : profile.id}).save();// this creates a new model instance
+    done (null, user);
     }
-
-  })
 
 }));
